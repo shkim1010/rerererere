@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>학교 시간표 웹 - 로그인 / 회원가입</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@700&display=swap');
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: linear-gradient(135deg, #fdf6f0, #f7e8dc);
+      font-family: 'Montserrat', sans-serif;
+      color: #4b3b2b;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      box-sizing: border-box;
+    }
+    body {
+      display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh; padding: 40px 20px;
+    }
+    .container {
+      background-color: #fffdfa;
+      border-radius: 24px;
+      box-shadow: 0 16px 40px rgba(75,59,43,0.15);
+      width: 480px;
+      max-width: 95vw;
+      padding: 48px 36px;
+      box-sizing: border-box;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      color: #6a4f4b;
+      margin-bottom: 32px;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      font-size: 18px;
+      font-weight: 500;
+      color: #4b3b2b;
+      background-color: #f9f5f1;
+      border: 2px solid #d8cfc6;
+      border-radius: 16px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      outline: none;
+      box-sizing: border-box;
+    }
+    input[type="text"]:focus, input[type="password"]:focus {
+      border-color: #a87e6f;
+      outline: none;
+      box-shadow: 0 0 10px rgba(168,126,111,0.5);
+      background: #fff;
+    }
+    button {
+      width: 100%;
+      padding: 18px 0;
+      background: #a87e6f;
+      color: #fffdfa;
+      font-weight: 700;
+      font-size: 18px;
+      border: none;
+      border-radius: 18px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(168,126,111,0.5);
+      transition: background 0.4s ease, box-shadow 0.4s ease;
+      margin-bottom: 12px;
+    }
+    button:hover {
+      background: #856451;
+      box-shadow: 0 12px 30px rgba(133,100,81,0.7);
+    }
+    #signupForm {
+      display: none;
+      width: 100%;
+      margin-top: 20px;
+    }
+    #showSignupBtn {
+      width: auto;
+      padding: 8px 20px;
+      background: transparent;
+      color: #a87e6f;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: none;
+      border: 2px solid #a87e6f;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+      margin-top: 0;
+      text-align: center;
+    }
+    #showSignupBtn:hover {
+      background: #a87e6f;
+      color: #fffdfa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>로그인</h1>
+
+    <input id="loginId" type="text" placeholder="아이디" />
+    <input id="loginPw" type="password" placeholder="비밀번호" />
+    <button onclick="login()">로그인</button>
+
+    <button id="showSignupBtn" onclick="toggleSignup()">회원가입</button>
+
+    <div id="signupForm">
+      <h1>회원가입</h1>
+      <input id="signupId" type="text" placeholder="아이디" />
+      <input id="signupPw" type="password" placeholder="비밀번호" />
+      <input id="signupClass" type="text" placeholder="학년-반 (예: 1-3)" />
+      <button onclick="signup()">회원가입 완료</button>
+    </div>
+  </div>
+
+  <script>
+    function toggleSignup() {
+      const form = document.getElementById('signupForm');
+      if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+      } else {
+        form.style.display = 'none';
+      }
+    }
+
+    function signup() {
+      const id = document.getElementById('signupId').value.trim();
+      const pw = document.getElementById('signupPw').value.trim();
+      const userClass = document.getElementById('signupClass').value.trim();
+
+      if (!id || !pw || !userClass) {
+        alert('아이디, 비밀번호, 학년-반 모두 입력하세요.');
+        return;
+      }
+
+      let users = JSON.parse(localStorage.getItem('users') || '{}');
+
+      if (users[id]) {
+        alert('이미 존재하는 아이디입니다.');
+        return;
+      }
+
+      users[id] = { password: pw, class: userClass };
+      localStorage.setItem('users', JSON.stringify(users));
+
+      localStorage.setItem('loggedInUser', id);
+      localStorage.setItem('selectedClass', userClass);
+
+      alert('회원가입 완료! 바로 반 시간표 페이지로 이동합니다.');
+
+      window.location.href = 'schedule.html';
+    }
+
+    function login() {
+      const id = document.getElementById('loginId').value.trim();
+      const pw = document.getElementById('loginPw').value.trim();
+
+      let users = JSON.parse(localStorage.getItem('users') || '{}');
+
+      if (users[id] && users[id].password === pw) {
+        localStorage.setItem('loggedInUser', id);
+        localStorage.setItem('selectedClass', users[id].class);
+
+        alert('로그인 성공! 자기 반 페이지로 이동합니다.');
+
+        window.location.href = 'schedule.html';
+      } else {
+        alert('아이디 또는 비밀번호가 틀렸습니다.');
+      }
+    }
+  </script>
+</body>
+</html>
